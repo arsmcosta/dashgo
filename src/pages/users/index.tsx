@@ -20,7 +20,6 @@ import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 import Link from "next/link";
-import { useEffect } from "react";
 import { useQuery } from "react-query";
 
 export default function UserList() {
