@@ -5,7 +5,7 @@ import { SidebarDrawerProvider } from "../contexts/SidebarDrawerContext";
 import { makeServer } from "../services/mirage";
 
 if(process.env.NODE_ENV === "development") {
-  makeServer
+  makeServer();
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
