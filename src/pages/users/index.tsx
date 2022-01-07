@@ -25,24 +25,32 @@ import { useUsers } from "../../services/hooks/useUsers";
 import { useState } from "react";
 import { queryClient } from "../../services/queryClient";
 import { api } from "../../services/api";
+import { GetServerSideProps } from "next";
+import { getUsers } from "../../services/hooks/useUsers";
 
-export default function UserList() {
+export default function UserList({ users }) {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isFetching, error } = useUsers(page);
+  const { data, isLoading, isFetching, error } = useUsers(page, {
+    initialData: users,
+  });
 
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
 
-    async function handlePrefetchUser(userID: string) {
-    await queryClient.prefetchQuery(['user', userID], async () => {
-      const response = await api.get(`users/${userID}`)
+  async function handlePrefetchUser(userID: string) {
+    await queryClient.prefetchQuery(
+      ["user", userID],
+      async () => {
+        const response = await api.get(`users/${userID}`);
 
-      return response.data;
-    }, {
-      staleTime: 1000 * 60 * 10,
-    })
+        return response.data;
+      },
+      {
+        staleTime: 1000 * 60 * 10,
+      }
+    );
   }
 
   return (
@@ -104,7 +112,10 @@ export default function UserList() {
                         </Td>
                         <Td>
                           <Box>
-                            <Link color="purple.400" onMouseEnter={() => handlePrefetchUser(user.id)}>
+                            <Link
+                              color="purple.400"
+                              onMouseEnter={() => handlePrefetchUser(user.id)}
+                            >
                               <Text fontWeight="bold">{user.name}</Text>
                             </Link>
                             <Text fontSize="sm" color="gray.300">
@@ -145,3 +156,13 @@ export default function UserList() {
     </Box>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { users, totalCount } = await getUsers(1);
+
+  return {
+    props: {
+      users,
+    },
+  };
+};
